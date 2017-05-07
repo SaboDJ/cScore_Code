@@ -62,7 +62,7 @@ public class RecordsTest extends TestCase {
         deleteFile(filename);
     }
 
-    public void testExportToJson() throws Exception {
+    public void testJSONExportImport() throws Exception {
         // Setup
         String filename = "TempFile";
         createFile(filename);
