@@ -1,16 +1,26 @@
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.SortedMap;
+import java.util.PrimitiveIterator;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Created by beast on 5/7/17.
  */
 public class Query {
+    private final String JSONFILE = "data.json";
     protected String[] select = {};
     protected String[] order = {};
     protected String[] filter = {};
 
     public Query(String[] args){
-        optionsParse(args);
+        execute(args);
     }
 
 
@@ -50,6 +60,73 @@ public class Query {
             }
         }
     }
+
+    protected void execute(String[] args){
+        // set the parameters
+        optionsParse(args);
+
+        try {
+            importRecords();
+        }
+        catch (Exception e) {
+            System.out.println("Could not import records, Exiting");
+            System.exit(1);
+        }
+    }
+
+    public void importRecords() throws Exception {
+        ConcurrentSkipListMap<String, String> records = new ConcurrentSkipListMap<>();
+        File file = new File(JSONFILE);
+
+        if (!file.exists()) {
+            System.out.println("Info: No data to load from Json");
+            return;
+        }
+
+        JSONParser parser = new JSONParser();
+        FileReader reader = new FileReader(file);
+        JSONArray list = (JSONArray) parser.parse(reader);
+        for(int i = 0; i < list.size(); i++) {
+            JSONObject obj = (JSONObject) list.get(i);
+
+            // build the key so that records are sorted correctly
+            String key = "";
+            if(this.order.length > 0) {
+                for (int k = 0; k < this.order.length; k++) {
+                    key += obj.get(this.order[k]);
+                    key += (k == this.order.length - 1 ? i : "");
+                }
+            }
+            else {
+                key += obj.get("STB");
+                key += i;
+            }
+
+            // builds the string to display
+            String value = "";
+            for(int j = 0; j < this.select.length; j++){
+                value += obj.get(this.select[j]);
+                value += (j == this.select.length -1 ? "": "," );
+            }
+
+            // If there is a filter only add the record if the filter matches
+            if (this.filter.length == 2) {
+                if (this.filter[1].equals((String) obj.get(this.filter[0]))) {
+                    records.put(key, value);
+                }
+            }
+            // if no filter just add the record
+            else {
+                records.put(key, value);
+            }
+        }
+
+        for (String value : records.values()){
+            System.out.println(value);
+        }
+
+    }
+
 
     public static void main(String[] args) {
       Query query = new Query(args);

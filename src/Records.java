@@ -14,7 +14,7 @@ import java.io.FileWriter;
  *
  */
 public class Records {
-    public final String JSONFILE = "data.json";
+    private final String JSONFILE = "data.json";
     private HashMap<String, Record> records;
 
     public Records() {
@@ -125,6 +125,12 @@ public class Records {
             addRecord(record);
         }
 
+    }
+
+    public void display() {
+        for (Record record: records.values()){
+            System.out.println(record.getTitle() + "," + record.getRev() + "," + record.getDate());
+        }
     }
 
 }
