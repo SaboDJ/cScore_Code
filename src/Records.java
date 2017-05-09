@@ -10,22 +10,34 @@ import java.io.FileWriter;
 
 
 /**
- * Manages a HashMap of Records. Any record with the same STB, TITLE, and DATE will be overwritten
- *
+ * Manages a set of Records. Any record with the same STB, TITLE, and DATE will be overwritten by the
+ * most recent record. Stores the records in a JSON file for archiving.
  */
+
 public class Records {
     private final String JSONFILE = "data.json";
-    private HashMap<String, Record> records;
+    private HashMap<String, Record> records = new HashMap<>();
+    private HashMap<String, RecordUpdate> updates = new HashMap<>();
 
-    public Records() {
-        this.records = new HashMap<>();
+    public class RecordUpdate {
+        Record record;
+        String filename;
+        int line;
+
+        public RecordUpdate(Record record, String filename, int line) {
+            this.record = record;
+            this.filename = filename;
+            this.line = line;
+        }
+
     }
 
-    public Records(String filename) {
-        this.records = new HashMap<>();
-        importFromFile(filename);
-    }
-
+    /**
+     * Adds the <code>Record</code> to <code>Records</code>. Creates a key out of the record's STB+TITLE+DATE
+     * to ensure that each record is unique. If the key already exits in records the record in records
+     * will be overwritten.
+     * @param record the data to add
+     */
     public void addRecord(Record record) {
         String key = record.getStb() + record.getTitle() + record.getDate();
         records.put(key, record);
@@ -43,11 +55,12 @@ public class Records {
      * records. If there is any issue opening the file an error will be printed and the task will terminate gracefully.
      * If there is any issue parsing a record, the record will be printed, skipped, and the import will continue.
      * @param filename the name of the file to import from.
-     *
      */
     public void importFromFile(String filename){
         File file;
         Scanner reader;
+
+        // Open the file and throw an exception if there is any issue
         try {
             file = new File(filename);
             reader = new Scanner(file);
@@ -66,7 +79,6 @@ public class Records {
                 System.out.println("Error: Record could not be parsed '" + line + "'");
                 continue;
             }
-
         }
 
     }
@@ -92,11 +104,11 @@ public class Records {
 
             //file.write(jsonObject.toJSONString() + "\n" );
             list.add(jsonObject);
-
         }
 
         file.write(list.toJSONString());
         file.close();
+
     }
 
     public void importFromJson() throws Exception {
@@ -127,10 +139,5 @@ public class Records {
 
     }
 
-    public void display() {
-        for (Record record: records.values()){
-            System.out.println(record.getTitle() + "," + record.getRev() + "," + record.getDate());
-        }
-    }
-
 }
+

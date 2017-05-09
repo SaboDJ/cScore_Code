@@ -32,33 +32,14 @@ public class Record {
 
     }
 
+    /**
+     * Constructor that parses a formatted string to create a new record.
+     * Expected format:  STB|TITLE|PROVIDER|DATE|REV|VIEW_TIME
+     * @param data the string to be parsed
+     * @throws Exception if parsing fails
+     */
     public Record (String data) throws Exception {
         parser(data);
-    }
-
-    protected void setStb(String stb) {
-        if (stb.length() > 64 || stb.length() == 0){
-            throw new IllegalArgumentException("Invalid STB: " + stb);
-        }
-        this.stb = stb.toCharArray();
-    }
-
-    protected void setTitle(String title) {
-        if (title.length() > 64 || title.length() == 0){
-            throw new IllegalArgumentException("Invalid Title: " + title);
-        }
-        this.title = title.toCharArray();
-    }
-
-    protected void setProvider(String provider) {
-        if (provider.length() > 64 || provider.length() == 0){
-            throw new IllegalArgumentException("Invalid Provider: " + provider);
-        }
-        this.provider = provider.toCharArray();
-    }
-
-    protected void setRev(double rev) {
-        this.rev = rev;
     }
 
     /**
@@ -149,8 +130,6 @@ public class Record {
         this.provider = list[2].toCharArray();
         setDateTime(list[3], list[5]);
         this.rev = Double.valueOf(list[4]);
-
-
 
     }
 

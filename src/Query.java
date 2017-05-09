@@ -4,14 +4,14 @@ import org.json.simple.parser.JSONParser;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.SortedMap;
-import java.util.PrimitiveIterator;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+
 /**
- * Created by beast on 5/7/17.
+ * Handles queries from command line arguments.
+ * Required: Select '-s FIELDNAME'. can have multiple fields separated by commas
+ * Optional: Order By '-o FIELDNAME' can handle multiple order bys separated by commas
+ * Optional: Filter '-f FIELDNAME=DATA' filters the result to only contain elements that match the given data
  */
 public class Query {
     private final String JSONFILE = "data.json";
@@ -22,7 +22,6 @@ public class Query {
     public Query(String[] args){
         execute(args);
     }
-
 
     /**
      * Parses the inputted arguments and adds sets the corresponding arrays to the argument values.
@@ -59,6 +58,7 @@ public class Query {
                 System.exit(1);
             }
         }
+
     }
 
     protected void execute(String[] args){
@@ -72,6 +72,7 @@ public class Query {
             System.out.println("Could not import records, Exiting");
             System.exit(1);
         }
+
     }
 
     public void importRecords() throws Exception {
@@ -132,4 +133,5 @@ public class Query {
       Query query = new Query(args);
 
     }
+
 }

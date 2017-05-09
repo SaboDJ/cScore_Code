@@ -42,7 +42,8 @@ public class RecordsTest extends TestCase {
         String filename = "TempFile";
         createFile(filename);
         // Call
-        Records records = new Records(filename);
+        Records records = new Records();
+        records.importFromFile(filename);
         // Test
         assertEquals(4, records.getCount());
         // Cleanup
@@ -54,7 +55,8 @@ public class RecordsTest extends TestCase {
         String filename = "TempFile";
         createFile(filename);
         // Call
-        Records records = new Records(filename);
+        Records records = new Records();
+        records.importFromFile(filename);
         records.importFromFile(filename);
         // Test
         assertEquals(4, records.getCount());
@@ -68,7 +70,8 @@ public class RecordsTest extends TestCase {
         createFile(filename);
         Records records2 = new Records();
         // Call
-        Records records = new Records(filename);
+        Records records = new Records();
+        records.importFromFile(filename);
         records.exportToJson();
         records2.importFromJson();
         // Test
