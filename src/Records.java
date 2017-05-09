@@ -7,6 +7,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import java.io.FileWriter;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 
 /**
@@ -17,20 +18,28 @@ import java.io.FileWriter;
 public class Records {
     private final String JSONFILE = "data.json";
     private HashMap<String, Record> records = new HashMap<>();
-    private HashMap<String, RecordUpdate> updates = new HashMap<>();
+    private HashMap<String, Location> recordMappings = new HashMap<>();
 
-    public class RecordUpdate {
+
+   public class Location {
+       String filename;
+       int index;
+
+       public Location(String filename, int index) {
+           this.filename = filename;
+           this.index = index;
+       }
+   }
+
+    public class RecordUpdate extends Location {
         Record record;
-        String filename;
-        int line;
 
-        public RecordUpdate(Record record, String filename, int line) {
+        public RecordUpdate(Location location, Record record) {
+            super(location.filename, location.index);
             this.record = record;
-            this.filename = filename;
-            this.line = line;
         }
-
     }
+
 
     /**
      * Adds the <code>Record</code> to <code>Records</code>. Creates a key out of the record's STB+TITLE+DATE
@@ -89,21 +98,42 @@ public class Records {
      * @throws IOException if there is a problem with the file
      */
     public void exportToJson() throws IOException {
+        ConcurrentSkipListMap<String, RecordUpdate> toUpdate = new ConcurrentSkipListMap<>();
+        String filename = "";
         FileWriter file = new FileWriter(JSONFILE);
         JSONArray list = new JSONArray();
+        int index = 0;
 
         for (Record record: records.values()) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("KEY", record.getStb()+record.getTitle()+record.getDate());
-            jsonObject.put("STB", record.getStb());
-            jsonObject.put("TITLE", record.getTitle());
-            jsonObject.put("PROVIDER", record.getProvider());
-            jsonObject.put("DATE", record.getDate());
-            jsonObject.put("REV", record.getRev());
-            jsonObject.put("VIEW_TIME", record.getViewTime());
+            // see if the record already exists in a file
+            Location found = recordMappings.get(record.getKey());
+            // if the found then we need to update the record so we add it to our update list
+            if( found != null) {
+                RecordUpdate upRecord = new RecordUpdate(found, record);
+                toUpdate.put(found.filename + record.getKey(), upRecord);
+            }
+            // otherwise we add the file to our output
+            else {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("KEY", record.getKey());
+                jsonObject.put("STB", record.getStb());
+                jsonObject.put("TITLE", record.getTitle());
+                jsonObject.put("PROVIDER", record.getProvider());
+                jsonObject.put("DATE", record.getDate());
+                jsonObject.put("REV", record.getRev());
+                jsonObject.put("VIEW_TIME", record.getViewTime());
 
-            //file.write(jsonObject.toJSONString() + "\n" );
-            list.add(jsonObject);
+                // Add the record to our json blob
+                list.add(jsonObject);
+                // Add the location to the record mapping
+                recordMappings.put(record.getKey(), new Location(filename, index));
+                index++;
+            }
+        }
+
+        // update other files if needed
+        if(toUpdate.size() > 0) {
+            // call an update function
         }
 
         file.write(list.toJSONString());

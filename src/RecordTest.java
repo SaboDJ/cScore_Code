@@ -39,46 +39,11 @@ public class RecordTest extends TestCase {
         assertEquals("provider1", record.getProvider());
     }
 
-    public void testGetdYear() throws Exception {
-        // Setup
-        Record record = createRecord();
-        // Test
-        assertEquals(2017, record.getDateYear());
-    }
-
-    public void testGetdMonth() throws Exception {
-        // Setup
-        Record record = createRecord();
-        // Test
-        assertEquals(5, record.getDateMonth());
-    }
-
-    public void testGetdDay() throws Exception {
-        // Setup
-        Record record = createRecord();
-        // Test
-        assertEquals(6, record.getDateDay());
-    }
-
     public void testGetRev() throws Exception {
         // Setup
         Record record = createRecord();
         // Test
         assertEquals(1.5, record.getRev());
-    }
-
-    public void testGetvHour() throws Exception {
-        // Setup
-        Record record = createRecord();
-        // Test
-        assertEquals(0, record.getViewHour());
-    }
-
-    public void testGetvMinute() throws Exception {
-        // Setup
-        Record record = createRecord();
-        // Test
-        assertEquals(20, record.getViewMinute());
     }
 
     public void testParser() throws Exception {
@@ -90,13 +55,7 @@ public class RecordTest extends TestCase {
             assertEquals("stb1", record.getStb());
             assertEquals("the matrix", record.getTitle());
             assertEquals("warner bros", record.getProvider());
-            assertEquals(2014, record.getDateYear());
-            assertEquals(4, record.getDateMonth());
-            assertEquals(1, record.getDateDay());
             assertEquals(4.0, record.getRev());
-            assertEquals(1, record.getViewHour());
-            assertEquals(30, record.getViewMinute());
-
         }
         catch (Exception e) {
             // if an exception is thrown the test fails

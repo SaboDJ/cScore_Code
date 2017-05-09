@@ -77,28 +77,8 @@ public class Record {
         return String.valueOf(provider);
     }
 
-    public int getDateYear() {
-        return date_view_time.getYear();
-    }
-
-    public int getDateMonth() {
-        return date_view_time.getMonthValue();
-    }
-
-    public int getDateDay() {
-        return date_view_time.getDayOfMonth();
-    }
-
     public double getRev() {
         return rev;
-    }
-
-    public int getViewHour() {
-        return date_view_time.getHour();
-    }
-
-    public int getViewMinute() {
-        return date_view_time.getMinute();
     }
 
     public String getDate() {
@@ -109,6 +89,10 @@ public class Record {
     public String getViewTime() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("k:mm");
         return date_view_time.format(formatter);
+    }
+
+    public String getKey(){
+        return getStb() + getTitle() + getDate();
     }
 
 
@@ -131,20 +115,6 @@ public class Record {
         setDateTime(list[3], list[5]);
         this.rev = Double.valueOf(list[4]);
 
-    }
-
-    public java.lang.String toString() {
-        return "Record{" +
-                "stb=" + String.valueOf(stb) +
-                ", title=" + String.valueOf(title) +
-                ", provider=" + String.valueOf(provider) +
-                ", dYear=" + getDateYear() +
-                ", dMonth=" + getDateMonth() +
-                ", dDay=" + getDateDay() +
-                ", rev=" + rev +
-                ", vHour=" + getViewHour() +
-                ", vMinute=" + getViewMinute() +
-                '}';
     }
 
 }

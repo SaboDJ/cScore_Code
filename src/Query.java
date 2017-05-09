@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 
 /**
- * Handles queries from command line arguments.
+ * Handles queries from command index arguments.
  * Required: Select '-s FIELDNAME'. can have multiple fields separated by commas
  * Optional: Order By '-o FIELDNAME' can handle multiple order bys separated by commas
  * Optional: Filter '-f FIELDNAME=DATA' filters the result to only contain elements that match the given data
@@ -27,12 +27,12 @@ public class Query {
      * Parses the inputted arguments and adds sets the corresponding arrays to the argument values.
      *
      * @param args
-     *        The arguments from the command line
+     *        The arguments from the command index
      * @Throws IllegalArgumentException if any of the arguments are invalid
      */
     protected void optionsParse(String[] args ) {
         if(args.length == 0) {
-            System.err.println("Missing command line arguments");
+            System.err.println("Missing command index arguments");
             System.exit(1);
         }
 
