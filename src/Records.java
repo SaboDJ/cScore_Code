@@ -19,7 +19,9 @@ public class Records {
     private final String JSONFILE = "data.json";
     private HashMap<String, Record> records = new HashMap<>();
     private HashMap<String, Location> recordMappings = new HashMap<>();
-
+    private int maxRecords = 1000;
+    private int recordCount = 0;
+    private String jsonName = "export";
 
     /**
      * Object to store a records location
@@ -46,6 +48,22 @@ public class Records {
         }
     }
 
+    /**
+     * Sets the max number of records to add before exporting to a file
+     * @param max record count per file
+     */
+    public void setMaxRecords( int max) {
+        this.maxRecords = max;
+    }
+
+    /**
+     * sets the default name for json exports
+     * @param name file name to export
+     */
+    public void setJsonName(String name){
+        this.jsonName = name;
+    }
+
 
     /**
      * Adds the <code>Record</code> to <code>Records</code>. Creates a key out of the record's STB+TITLE+DATE
@@ -56,6 +74,7 @@ public class Records {
     public void addRecord(Record record) {
         String key = record.getStb() + record.getTitle() + record.getDate();
         records.put(key, record);
+        recordCount++;
     }
 
     /**
@@ -88,6 +107,11 @@ public class Records {
             String line = reader.nextLine();
             try {
                 Record record = new Record(line);
+                // If the current record count is the max we will export to a json file
+                if (this.recordCount % maxRecords == maxRecords -1 ) {
+                    int num = this.recordCount / this.maxRecords;
+                    exportToJson(this.jsonName + num);
+                }
                 addRecord(record);
             }
             catch (Exception e) {
