@@ -103,9 +103,8 @@ public class Records {
      * to be updated. The key is a combination of the STB+TITLE+DATE which identifies unique records.
      * @throws IOException if there is a problem with the file
      */
-    public void exportToJson() throws Exception {
+    public void exportToJson(String filename) throws Exception {
         ConcurrentSkipListMap<String, RecordUpdate> toUpdate = new ConcurrentSkipListMap<>();
-        String filename = JSONFILE;
         FileWriter file = new FileWriter(filename);
         JSONArray list = new JSONArray();
         int index = 0;
@@ -137,6 +136,8 @@ public class Records {
 
         file.write(list.toJSONString());
         file.close();
+        // when we are done exporting we clear the records
+        records.clear();
 
     }
 
@@ -162,15 +163,17 @@ public class Records {
         if (toUpdate.size() == 0) {
             return;
         }
+
         // Get the first file and setup the parser
-        String filename = toUpdate.get(0).filename;
+        String filename =  toUpdate.get(toUpdate.firstKey()).filename;
         File file = new File(filename);
         JSONParser parser = new JSONParser();
         FileReader reader = new FileReader(file);
         JSONArray list = (JSONArray) parser.parse(reader);
 
-        for(int i = 0; i < toUpdate.size(); i++){
-            RecordUpdate uRecord = toUpdate.get(i);
+
+        for(RecordUpdate uRecord : toUpdate.values()){
+            //RecordUpdate uRecord = toUpdate.get(i);
             // Check if the record is in the file already loaded, if not load the file
             if (!filename.equals(uRecord.filename)) {
                 // updated the file before we move to the next
@@ -182,8 +185,8 @@ public class Records {
             }
 
             // updates the data in the json array
-            list.remove(i);
-            list.add(i,recordToJson(uRecord.record));
+            list.remove(uRecord.index);
+            list.add(uRecord.index,recordToJson(uRecord.record));
         }
 
         // update the last file

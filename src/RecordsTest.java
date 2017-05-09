@@ -19,7 +19,6 @@ public class RecordsTest extends TestCase {
             writer.write("stb1|the matrix|warner bros|2014-04-01|4.00|1:30\n");
             writer.write("stb2|the hobbit|warner bros|2014-04-02|8.00|2:45\n");
             writer.write("stb1|unbreakable|buena vista|2014-04-03|6.00|2:05\n");
-
             writer.write("stb3|the matrix|warner bros|2014-04-02|4.00|1:05\n");
             writer.close();
         }
@@ -72,11 +71,28 @@ public class RecordsTest extends TestCase {
         // Call
         Records records = new Records();
         records.importFromFile(filename);
-        records.exportToJson();
+        records.exportToJson("jsont1");
         records2.importFromJson();
         // Test
         assertEquals(4, records.getCount());
         assertEquals(4, records2.getCount());
+        // Cleanup
+        deleteFile(filename);
+
+    }
+
+    public void testJSONExportImport2() throws Exception {
+        // Setup
+        String filename = "TempFile";
+        createFile(filename);
+        // Call
+        Records records = new Records();
+        records.importFromFile(filename);
+        records.exportToJson("jsonfile.json");
+        records.importFromFile("file1");
+        records.exportToJson("jsonfile2.json");
+        // Test
+        assertEquals(0, records.getCount());
         // Cleanup
         deleteFile(filename);
 
