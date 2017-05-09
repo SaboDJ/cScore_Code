@@ -97,10 +97,10 @@ public class Records {
      * to be updated. The key is a combination of the STB+TITLE+DATE which identifies unique records.
      * @throws IOException if there is a problem with the file
      */
-    public void exportToJson() throws IOException {
+    public void exportToJson() throws Exception {
         ConcurrentSkipListMap<String, RecordUpdate> toUpdate = new ConcurrentSkipListMap<>();
-        String filename = "";
-        FileWriter file = new FileWriter(JSONFILE);
+        String filename = JSONFILE;
+        FileWriter file = new FileWriter(filename);
         JSONArray list = new JSONArray();
         int index = 0;
 
@@ -110,6 +110,7 @@ public class Records {
             // if the found then we need to update the record so we add it to our update list
             if( found != null) {
                 RecordUpdate upRecord = new RecordUpdate(found, record);
+                // Creating the key with the filename first so that the files will be grouped
                 toUpdate.put(found.filename + record.getKey(), upRecord);
             }
             // otherwise we add the file to our output
@@ -133,10 +134,56 @@ public class Records {
 
         // update other files if needed
         if(toUpdate.size() > 0) {
-            // call an update function
+            updateFiles(toUpdate);
         }
 
         file.write(list.toJSONString());
+        file.close();
+
+    }
+
+    protected void updateFiles(ConcurrentSkipListMap<String, RecordUpdate> toUpdate) throws Exception {
+        if (toUpdate.size() == 0) {
+            return;
+        }
+        // Get the first file and setup the parser
+        String filename = toUpdate.get(0).filename;
+        File file = new File(filename);
+        JSONParser parser = new JSONParser();
+        FileReader reader = new FileReader(file);
+        JSONArray list = (JSONArray) parser.parse(reader);
+
+        for(int i = 0; i < toUpdate.size(); i++){
+            RecordUpdate uRecord = toUpdate.get(i);
+            // Check if the record is in the file already loaded, if not load the file
+            if (!filename.equals(uRecord.filename)) {
+                // updated the file before we move to the next
+                writeJsonArrayToFile(filename, list);
+                // read in the new file
+                filename = uRecord.filename;
+                reader = new FileReader(file);
+                list = (JSONArray) parser.parse(reader);
+            }
+
+            // updates the data in the json array
+            list.remove(i);
+            list.add(i, uRecord.record);
+        }
+
+        // update the last file
+        writeJsonArrayToFile(filename, list);
+
+    }
+
+    /**
+     * Writes the contents of the array to the file
+     * @param filename the name of the file to be written
+     * @param array the data to be written in the file
+     * @throws Exception when there is an IO issue
+     */
+    protected void writeJsonArrayToFile(String filename, JSONArray array) throws Exception {
+        FileWriter file = new FileWriter(filename);
+        file.write(array.toJSONString());
         file.close();
 
     }
