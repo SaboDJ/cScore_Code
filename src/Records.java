@@ -21,7 +21,10 @@ public class Records {
     private HashMap<String, Location> recordMappings = new HashMap<>();
 
 
-   public class Location {
+    /**
+     * Object to store a records location
+      */
+    public class Location {
        String filename;
        int index;
 
@@ -31,6 +34,9 @@ public class Records {
        }
    }
 
+    /**
+     * Class to store a record needing to be updated
+     */
     public class RecordUpdate extends Location {
         Record record;
 
@@ -115,15 +121,7 @@ public class Records {
             }
             // otherwise we add the file to our output
             else {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("KEY", record.getKey());
-                jsonObject.put("STB", record.getStb());
-                jsonObject.put("TITLE", record.getTitle());
-                jsonObject.put("PROVIDER", record.getProvider());
-                jsonObject.put("DATE", record.getDate());
-                jsonObject.put("REV", record.getRev());
-                jsonObject.put("VIEW_TIME", record.getViewTime());
-
+                JSONObject jsonObject = recordToJson(record);
                 // Add the record to our json blob
                 list.add(jsonObject);
                 // Add the location to the record mapping
@@ -142,6 +140,24 @@ public class Records {
 
     }
 
+    protected JSONObject recordToJson(Record record) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("KEY", record.getKey());
+        jsonObject.put("STB", record.getStb());
+        jsonObject.put("TITLE", record.getTitle());
+        jsonObject.put("PROVIDER", record.getProvider());
+        jsonObject.put("DATE", record.getDate());
+        jsonObject.put("REV", record.getRev());
+        jsonObject.put("VIEW_TIME", record.getViewTime());
+        return jsonObject;
+    }
+
+    /**
+     * Updates the records in their corresponding files. Groups all records for a specific file so that it only
+     * needs to be updated ones.
+     * @param toUpdate the records needing to be updated
+     * @throws Exception IO or Parse exceptions if there are any issues
+     */
     protected void updateFiles(ConcurrentSkipListMap<String, RecordUpdate> toUpdate) throws Exception {
         if (toUpdate.size() == 0) {
             return;
@@ -167,7 +183,7 @@ public class Records {
 
             // updates the data in the json array
             list.remove(i);
-            list.add(i, uRecord.record);
+            list.add(i,recordToJson(uRecord.record));
         }
 
         // update the last file
